@@ -69,6 +69,8 @@ namespace HybridCLR
             m_VersionIndex = VersionIndex;
             m_BuildIndex = BuildIndex;
             m_HotfixPlatformIndex = HotfixPlatformIndex;
+            //查找文件夹
+            m_Controller.UnityInstallDirectory = Directory.GetFiles(EditorApplication.applicationPath.ToString(), m_Controller.VersionValues[m_VersionIndex])[0];
             Debug.Log(m_Controller.UnityInstallDirectory);
         }
 
@@ -132,6 +134,15 @@ namespace HybridCLR
             EditorGUILayout.BeginVertical("box");          
             GUIItem("生成报告", "Create",ReporterEditor.CreateReporter);           
             EditorGUILayout.EndVertical();
+
+            string description = "";
+            EditorGUILayout.TextArea(description, GUILayout.MaxHeight(75));
+            //FindDirectory("2020.3.33" );
+            //description = FindDirectory("2020.3.33").ToString();
+
+            //用来测试查找文件夹
+            description = Directory.GetFiles(@"c:\", "2020.3.33")[0];
+           
         }
 
         private void compilePlatform()
@@ -208,6 +219,50 @@ namespace HybridCLR
             if(m_HotfixPlatformIndex == 2)
             {
                 BuildPlayerHelper.Build_Android64();
+            }
+        }
+
+
+
+       /* static void Main(string[] args)
+        {
+            String dirname = Console.ReadLine();
+            Console.WriteLine("共找到" + FindDirectory(dirname).ToString() + "个文件夹");
+            Console.ReadKey();
+        }*/
+
+        public  int FindDirectory(String dirname )
+        {
+            String[] logicDrivers = Environment.GetLogicalDrives();
+            int count = 0;
+            for (int i = 0; i < logicDrivers.Length; i++)
+            {
+                List<String> dirlist = new List<string>();
+                getDirs(logicDrivers[i], dirname, dirlist);
+                String[] dirs = dirlist.ToArray();
+                for (int j = 0; j < dirs.Length; j++)
+                {
+                    count++;
+                    Console.WriteLine(dirs[j]);
+
+                }
+            }
+            return count;
+        }
+        static void getDirs(String dirpath, String dirname, List<String> dirlist)
+        {
+            try
+            {
+                dirlist.AddRange(Directory.GetDirectories(dirpath, dirname, SearchOption.TopDirectoryOnly));
+                String[] dirs = Directory.GetDirectories(dirpath);
+                for (int i = 0; i < dirs.Length; i++)
+                {
+                    getDirs(dirs[i], dirname, dirlist);
+                }
+            }
+            catch
+            {
+                return;
             }
         }
     }
