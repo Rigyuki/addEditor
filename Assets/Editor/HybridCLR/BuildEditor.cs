@@ -60,7 +60,7 @@ namespace HybridCLR
         private static void Open()
         {
             BuildEditor window = GetWindow<BuildEditor>("HybridCLR Builder", true);
-            window.minSize = new Vector2(800f, 500f);
+            window.minSize = new Vector2(800f, 580f);          
         }
 
         private void OnEnable()
@@ -69,6 +69,7 @@ namespace HybridCLR
             m_VersionIndex = VersionIndex;
             m_BuildIndex = BuildIndex;
             m_HotfixPlatformIndex = HotfixPlatformIndex;
+            Debug.Log(m_Controller.UnityInstallDirectory);
         }
 
         private void OnGUI()
@@ -78,13 +79,14 @@ namespace HybridCLR
             //EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginVertical("box"); 
             GUISelectUnityDirectory("Unity安装目录的il2cpp", "Select");
+            EditorGUILayout.HelpBox(@"路径必须以il2cpp为结尾，例如2020.3.33版本的unity安装路径为：C:\Program Files\Unity\Hub\Editor\2020.3.33f1\Editor\Data\il2cpp", MessageType.None);
             int versionIndex = EditorGUILayout.Popup("Unity版本", m_VersionIndex, m_Controller.VersionNames);
             if (versionIndex != m_VersionIndex)
             {
                 VersionIndex = versionIndex;
-            }
+            }           
             GUIItem("初始化HybridCLR仓库并安装到到本项目。", "Install", InitHybridCLR);
-            EditorGUILayout.HelpBox("安装HybridCLR需要git和网络。点击Install开始安装，务必检查运行结果，确保输出了success ，而不是其他错误，才表示安装成功。", MessageType.Info);
+            EditorGUILayout.HelpBox("点击Install开始安装，务必检查运行结果，确保输出了success ，而不是其他错误，才表示安装成功。", MessageType.Info);
             EditorGUILayout.EndVertical();
 
             GUILayout.Space(5f);
@@ -123,6 +125,12 @@ namespace HybridCLR
             GUIItem("根据程序集自动生成所有桥接函数（Universal64）", "Generate", MethodBridgeHelper.MethodBridge_Universal64);
             GUIItem("根据程序集自动生成所有桥接函数（Arm64）", "Generate", MethodBridgeHelper.MethodBridge_Arm64);
             GUIItem("根据程序集自动生成所有桥接函数（ALL）", "Generate", MethodBridgeHelper.MethodBridge_All);
+            EditorGUILayout.EndVertical();
+
+            GUILayout.Space(5f);
+            EditorGUILayout.LabelField("Reporter", EditorStyles.boldLabel);
+            EditorGUILayout.BeginVertical("box");          
+            GUIItem("生成报告", "Create",ReporterEditor.CreateReporter);           
             EditorGUILayout.EndVertical();
         }
 
@@ -168,6 +176,8 @@ namespace HybridCLR
         private void GUISelectUnityDirectory(string content, string selectButton)
         {
             EditorGUILayout.BeginHorizontal();
+            
+
             m_Controller.UnityInstallDirectory = EditorGUILayout.TextField(content, m_Controller.UnityInstallDirectory);
             if (GUILayout.Button(selectButton, GUILayout.Width(100)))
             {
